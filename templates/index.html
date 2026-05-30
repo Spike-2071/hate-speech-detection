@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Content Moderation Detector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fafafa;
+            text-align: center;
+            margin-top: 50px;
+        }
+        textarea {
+            width: 60%;
+            height: 120px;
+            font-size: 16px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            resize: none;
+        }
+        button, input[type="file"] {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover { background-color: #0056b3; }
+        input[type="file"] { background-color: #28a745; color: white; }
+        input[type="file"]:hover { background-color: #1e7e34; }
+        .post-box {
+            margin-top: 30px;
+            background: white;
+            border: 1px solid #ccc;
+            width: 50%;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+        }
+        .post-box.hate {
+            border-left: 5px solid #dc3545;
+            background-color: #f8d7da;
+        }
+        .post-box.offensive {
+            border-left: 5px solid #ffc107;
+            background-color: #fff3cd;
+        }
+        .post-box.neutral {
+            border-left: 5px solid #28a745;
+            background-color: #d4edda;
+        }
+        .label {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .label.hate {
+            background-color: #dc3545;
+            color: white;
+        }
+        .label.offensive {
+            background-color: #ffc107;
+            color: #000;
+        }
+        .label.neutral {
+            background-color: #28a745;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h2>🗣️ Content Moderation Detection App</h2>
+    <p><small>Classification: 0 = Hate Speech | 1 = Offensive Language | 2 = Neutral</small></p>
+
+    <form method="POST" enctype="multipart/form-data">
+        <textarea name="text" id="text" placeholder="Type something...">{{ text }}</textarea><br>
+        <button type="submit" name="action" value="text">Post Text</button>
+        <br><br>
+        <label><strong>Upload Audio File:</strong></label><br>
+        <input type="file" name="audio" accept="audio/*"><br>
+        <button type="submit" name="action" value="audio">Upload & Classify Audio</button>
+    </form>
+
+    {% if result is not none %}
+        {% if result == 0 %}
+            <script>
+                alert("🚫 This post contains hate speech and will be removed!");
+            </script>
+        {% elif result == 1 %}
+            <script>
+                alert("⚠️ This post contains offensive language and has been flagged for review.");
+            </script>
+        {% elif result == 2 %}
+            <script>
+                alert("✅ This post is neutral and posted successfully!");
+            </script>
+        {% endif %}
+    {% endif %}
+
+    {% if posts %}
+        <h3>📰 Recent Posts</h3>
+        {% for post in posts %}
+            {% if post.label == 0 %}
+                <div class="post-box hate">
+                    <span class="label hate">HATE SPEECH</span>
+                    <p>{{ post.text }}</p>
+                </div>
+            {% elif post.label == 1 %}
+                <div class="post-box offensive">
+                    <span class="label offensive">OFFENSIVE</span>
+                    <p>{{ post.text }}</p>
+                </div>
+            {% else %}
+                <div class="post-box neutral">
+                    <span class="label neutral">NEUTRAL</span>
+                    <p>{{ post.text }}</p>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</body>
+</html>
